@@ -5,7 +5,6 @@ import os
 # Device configuration
 device = "mps"
 
-# 添加父目录到 Python 路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
