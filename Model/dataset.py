@@ -1,5 +1,8 @@
 from datasets import load_dataset
-
+import os
+os.environ['HF_ENDPOINT'] = 'https://www.modelscope.cn'
+# 可选：设置缓存目录
+os.environ['HUGGINGFACE_HUB_CACHE'] = '/tmp/huggingface_cache'
 ds = load_dataset("MLCommons/peoples_speech", "clean")
 
 ds.save_to_disk("Model/data/peoples_speech_clean")
