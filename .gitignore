@@ -4,3 +4,4 @@ Model/pth/en2zh_model.pth
 /.vscode
 Model/pth
 Model/data
+/.venv
