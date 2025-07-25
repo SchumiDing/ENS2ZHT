@@ -3,7 +3,7 @@ import os
 os.environ['HF_ENDPOINT'] = 'https://www.modelscope.cn'
 # 可选：设置缓存目录
 os.environ['HUGGINGFACE_HUB_CACHE'] = '/tmp/huggingface_cache'
-ds = MsDataset.load("MLCommons/peoples_speech", "clean", trust_remote_code=True)
+ds = MsDataset.load("MLCommons/peoples_speech", trust_remote_code=True)
 
 ds.save_to_disk("Model/data/peoples_speech_clean")
 
