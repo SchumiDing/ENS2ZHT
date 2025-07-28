@@ -5,3 +5,4 @@ Model/pth/en2zh_model.pth
 Model/pth
 Model/data
 /.venv
+/Model/dataset
