@@ -3,7 +3,7 @@ import sys
 import os
 
 # Device configuration
-device = "mps"
+device = "cpu"
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -57,6 +57,12 @@ class en2zh(torch.nn.Module):
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         self.to(device)
         
+        for param in self.parameters():
+            if param.dim() > 1:
+                torch.nn.init.xavier_uniform_(param)
+            else:
+                torch.nn.init.zeros_(param)
+        
 
     def audioTransform(self, audio: torch.Tensor):
 
@@ -85,14 +91,16 @@ class en2zh(torch.nn.Module):
                 break
             yield self.tokenizemodel.decode_tokens(newid[0][-1])
     
-    def autoRegressorTraining(self, inputAudio:torch.tensor, targetText:str, epoches=10):
+    def autoRegressorTraining(self, inputAudio:torch.tensor, targetText:str, epoches=1, log=False):
         
         inputAudio = inputAudio.to(device)
         targetTokens = self.tokenizemodel.to_vector(targetText)['last_hidden_state']
         targetTokens = targetTokens.to(device)
         l = len(targetTokens[0])
         lA = len(inputAudio)
+        loss = 0
         for _ in range(epoches):
+            loss = 0
             for i in range(l):
                 output = self.forward(inputAudio)
                 newtoken = output[-1].unsqueeze(0)
@@ -101,14 +109,18 @@ class en2zh(torch.nn.Module):
                 loss.backward()
                 self.optimizer.step()
                 inputAudio = torch.cat((inputAudio, newtoken.clone().detach()), dim=0)
-                print(f"Step {i+1}/{l}, Loss: {loss.item()}")
+                if log:
+                    print(f"Step {i+1}/{l}, Loss: {loss.item()}")
+                loss += loss.item()
+            loss = loss / l
 
         torch.save(self.state_dict(), 'Model/pth/en2zh_model.pth')
+        return loss
         
 
 if __name__ == "__main__":
     model = en2zh()
-
+    
     # Example usage
     audio_input = torch.randn(1, 768*1000).to(device)  # Dummy audio input
     audio_transformed = model.audioTransform(audio_input)
