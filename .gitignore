@@ -7,3 +7,4 @@ Model/data
 /.venv
 /Model/dataset
 /Model/test-clean
+Model/ollama.token
