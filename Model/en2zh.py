@@ -109,11 +109,11 @@ class en2zh(torch.nn.Module):
             loss = 0
             for i in range(l):
                 if i == 0:
-                    outAudio = targetTokens[0][0]
+                    outAudio = targetTokens[0][0].unsqueeze(0)
                 else:
+                    newtoken = output[-1].unsqueeze(0)
                     outAudio = torch.cat((outAudio, newtoken.clone().detach()), dim=0)
                 output = self.forward(torch.cat((inputAudio, outAudio), dim=0), outAudio)
-                newtoken = output[-1].unsqueeze(0)
                 loss = self.criterion(newtoken[0], targetTokens[0][i])
                 self.optimizer.zero_grad()
                 loss.backward()
