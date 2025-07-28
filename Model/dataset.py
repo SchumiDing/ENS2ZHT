@@ -10,7 +10,7 @@ ds2 = MsDataset.load('DatatangBeijing/207Hours-JapaneseSpeakingEnglishSpeechData
 ds3 =  MsDataset.load('DatatangBeijing/198Hours-MalaysianEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
 
 
-ds = ds1.concatenate(ds2).concatenate(ds3)
+# ds = ds1.concatenate(ds2).concatenate(ds3)
 
 import os
 if not os.path.exists("Model/data"):
