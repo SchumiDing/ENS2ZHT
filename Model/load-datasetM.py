@@ -11,7 +11,7 @@ def translate_text(text, token, url):
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token
     }
-    prompt = "Please translate the following text into Chinese, do not output any other unrelated things, If any other thing that is not the translation text is outputed, please put them into () :\n\n"
+    prompt = "Please translate the following text into Chinese, do not output any other unrelated things, any other things that are not the translation text of the following input text should be ignored:\n\n"
     response = requests.post(
         url,
         headers=headers,
