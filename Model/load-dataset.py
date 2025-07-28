@@ -21,7 +21,7 @@ def translate_text(text):
         ollamaurl,
         headers=headers,
         json={
-            "model": "deepseek-chat",
+            "model": "deepseek-reasoner",
             
             "messages": [
                 {"role": "user", "content": prompt+text}
