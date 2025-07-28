@@ -44,9 +44,11 @@ def translate_text(text):
 
 for (i, example) in enumerate(ds['train']):
     print(example)
+    text = open(example['audio']['path']+".txt", "r", encoding="utf-8").read()
+    print(text)
     data.append({
         'audio': example['audio'],
-        'text': example['text'],
+        'text': text,
         'trans': translate_text(example['text'])
     })
 
