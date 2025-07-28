@@ -6,3 +6,4 @@ Model/pth
 Model/data
 /.venv
 /Model/dataset
+/Model/test-clean
