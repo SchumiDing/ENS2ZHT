@@ -9,7 +9,7 @@ def translate_text(text):
     response = requests.post(
         ollamaurl + "/chat",
         json={
-            "model": "deepseek:70b",
+            "model": "deepseek-r1:70b",
             "messages": [
                 {"system": "You are a helpful assistant that translates English text to Chinese. Please only output the translated Chinese sentences based on sentences provided by the user and do not add any additional text."},
                 {"role": "user", "content": text}
