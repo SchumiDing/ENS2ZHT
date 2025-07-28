@@ -28,6 +28,7 @@ def translate_text(text, token, url):
         answer = response['choices'][0]['message']['content']
         answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
         answer = re.sub(r'\(.*?\)', '', answer, flags=re.DOTALL)
+        answer = re.sub(r'（.*?）', '', answer, flags=re.DOTALL)
         return answer.replace("\n", "")
     else:
         print(f"Error: {response.status_code}, {response.text}")
