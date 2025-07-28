@@ -37,6 +37,7 @@ else:
     device = "cpu"
 
 epoches = 10000
+batch_size = 32
 parser.add_argument('--epoches', type=int, default=10000, help='Number of training epochs (default: 10000)')
 args = parser.parse_args()
 if args.epoches > 10000:
@@ -57,19 +58,33 @@ if __name__ == "__main__":
     data = json.load(open(fil, "r"))
     
     training = []
-    
+    audio = []
+    text = []
     for item in data:
         audio_tensor = torch.tensor(item['audio']['array'], dtype=torch.float32).to(device)
         audio_tensor = model.audioTransform(audio_tensor)
-        training.append({
-            'audio': audio_tensor.to(device),
-            'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
-        })
+        # training.append({
+        #     'audio': audio_tensor.to(device),
+        #     'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
+        # })
+        audio.append(audio_tensor)
+        text.append(item['text'])
     np.random.shuffle(training)
+    train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
+
+    print(f"Training data created with {len(train_data)} batches., each")
+    for batch in train_data:
+        audio_batch, text_batch = batch
+        print(f" - Audio batch shape: {audio_batch.shape}, Text batch shape: {text_batch.shape}")
+        break
+    if not os.path.exists('Model/pth'):
+        os.makedirs('Model/pth')
     for epoch in range(epoches):
-        for item in training:
-            audio_tensor = item['audio']
-            chinese_text = item['chinese']
-            loss = model.autoRegressorTraining(audio_tensor, chinese_text)
-            print(f"Epoch {epoch+1}/{epoches}, Loss: {loss}")
-        print(f"Epoch {epoch+1}/{epoches} completed.")
+        total_loss = 0
+        for batch in train_data:
+            audio_batch, text_batch = batch
+            loss = model.autoRegressorTraining(audio_batch, text_batch, epoches=1, log=True)
+            total_loss += loss
+        
+        print(f"Epoch {epoch+1}/{epoches}, Total Loss: {total_loss/len(train_data)}")
+        torch.save(model.state_dict(), 'Model/pth/en2zh_model.pth')
