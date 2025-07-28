@@ -28,7 +28,6 @@ def translate_text(text, token, url):
         answer = response['choices'][0]['message']['content']
         answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
         answer = re.sub(r'\(.*?\)', '', answer, flags=re.DOTALL)
-        answer = re.sub(r'（.*?）', '', answer, flags=re.DOTALL)
         return answer.replace("\n", "")
     else:
         print(f"Error: {response.status_code}, {response.text}")
@@ -51,7 +50,7 @@ def process_row(row, audio_path, token, url):
 def main():
     parser = argparse.ArgumentParser(description="Load dataset and process audio/text with multithreaded translation.")
     parser.add_argument('--fildir', type=str, required=True, help='Directory containing the audio files and text files.')
-    parser.add_argument('--threads', type=int, default=512, help='Number of threads for translation API requests.')
+    parser.add_argument('--threads', type=int, default=96, help='Number of threads for translation API requests.')
     args = parser.parse_args()
     fildir = args.fildir
     num_threads = args.threads
