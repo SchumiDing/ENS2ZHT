@@ -1,23 +1,28 @@
-import os
+import os, re
 import torchaudio
 
 fildir = "Model/test-clean"
 
 import requests
-ollamaurl = "http://localhost:11434"
+ollamaurl = "http://127.0.0.1:11434/api/chat"
 def translate_text(text):
+    headers = {"Content-Type": "application/json"}
+    prompt = "Please translate the following text into Chinese, do not output any other unrelated things:\n\n"
     response = requests.post(
-        ollamaurl + "/chat",
+        ollamaurl,
+        headers=headers,
         json={
             "model": "deepseek-r1:70b",
             "messages": [
-                {"system": "You are a helpful assistant that translates English text to Chinese. Please only output the translated Chinese sentences based on sentences provided by the user and do not add any additional text."},
-                {"role": "user", "content": text}
-            ]
+                {"role": "user", "content": prompt+text}
+            ],
+            "stream":False
         }
     )
     if response.status_code == 200:
-        return response.json()['message']['content']
+        answer = response.json()['message']['content']
+        answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
+        return answer.replace("\n", "")
     else:
         print(f"Error: {response.status_code}, {response.text}")
         return None
