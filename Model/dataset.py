@@ -43,6 +43,7 @@ def translate_text(text):
         return None
 
 for (i, example) in enumerate(ds['train']):
+    print(example)
     data.append({
         'audio': example['audio'],
         'text': example['text'],
