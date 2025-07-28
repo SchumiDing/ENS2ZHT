@@ -1,7 +1,13 @@
+fildir = "Model/test-clean"
+
+import argparse
 import os, re
 import torchaudio
 
-fildir = "Model/test-clean"
+parser = argparse.ArgumentParser(description="Load dataset and process audio/text.")
+parser.add_argument('--fildir', type=str, required=True, help='Directory containing the audio files and text files.')
+args = parser.parse_args()
+fildir = args.fildir
 
 import requests
 ollamaurl = "https://api.deepseek.com/chat/completions"
