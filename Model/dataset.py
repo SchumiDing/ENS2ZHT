@@ -3,9 +3,20 @@ import os
 os.environ['HF_ENDPOINT'] = 'https://www.modelscope.cn'
 # 可选：设置缓存目录
 os.environ['HUGGINGFACE_HUB_CACHE'] = '/tmp/huggingface_cache'
-ds = MsDataset.load("MLCommons/peoples_speech", trust_remote_code=True)
-print(ds)
-ds.save_to_disk("Model/data/peoples_speech_clean")
+
+from modelscope.msdatasets import MsDataset
+ds1 = MsDataset.load('DatatangBeijing/502Hours-ChineseSpeakingEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
+ds2 = MsDataset.load('DatatangBeijing/207Hours-JapaneseSpeakingEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
+ds3 =  MsDataset.load('DatatangBeijing/198Hours-MalaysianEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
+
+
+ds = ds1.concatenate(ds2).concatenate(ds3)
+
+import os
+if not os.path.exists("Model/data"):
+    os.makedirs("Model/data")
+
+ds.save_to_disk("Model/dataset")
 
 data = []
 
