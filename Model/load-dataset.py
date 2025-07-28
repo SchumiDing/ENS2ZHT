@@ -53,6 +53,7 @@ for f in os.listdir(fildir):
             })
             chinese_translation = translate_text(" ".join(row.split(" ")[1:]))
             data[-1]['chinese'] = chinese_translation
+            print(f"Processed {audio_path}, Chinese translation: {chinese_translation}")
 
 import json
 
