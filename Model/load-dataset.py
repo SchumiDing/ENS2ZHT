@@ -14,7 +14,7 @@ ollamaurl = "https://api.deepseek.com/chat/completions"
 def translate_text(text):
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + open("Model/ollama.token", "r").read()
+        "Authorization": "Bearer " + open("Model/ollama.token", "r").read().replace("\n", "")
     }
     prompt = "Please translate the following text into Chinese, do not output any other unrelated things:\n\n"
     response = requests.post(
