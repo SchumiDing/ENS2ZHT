@@ -5,7 +5,7 @@ os.environ['HF_ENDPOINT'] = 'https://www.modelscope.cn'
 os.environ['HUGGINGFACE_HUB_CACHE'] = '/tmp/huggingface_cache'
 
 from modelscope.msdatasets import MsDataset
-ds1 = MsDataset.load('DatatangBeijing/502Hours-ChineseSpeakingEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
+ds1 = MsDataset.load('DatatangBeijing/502Hours-ChineseSpeakingEnglishSpeechDataByMobilePhone', subset_name='default')
 # ds2 = MsDataset.load('DatatangBeijing/207Hours-JapaneseSpeakingEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
 # ds3 =  MsDataset.load('DatatangBeijing/198Hours-MalaysianEnglishSpeechDataByMobilePhone', subset_name='default', split='train')
 
