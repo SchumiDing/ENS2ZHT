@@ -39,6 +39,7 @@ def translate_text(text):
         return None
 
 data = []
+i = 0
 for f in os.listdir(fildir):
     if f[0]=='.':
         continue
@@ -54,6 +55,7 @@ for f in os.listdir(fildir):
                 continue
             audio_path = f"{fildir}/{f}/{folder}/{row.split(' ')[0]}.flac"
             audio_tensor, sample_rate = torchaudio.load(audio_path)
+            print(f"Processing {audio_path} with text: {row} Sample rate: {sample_rate}")
             data.append({
                 'audio': {
                     'path': audio_path,
@@ -65,6 +67,9 @@ for f in os.listdir(fildir):
             chinese_translation = translate_text(" ".join(row.split(" ")[1:]))
             data[-1]['chinese'] = chinese_translation
             print(f"Processed {audio_path}, Chinese translation: {chinese_translation}")
+            i += 1
+            if i >= 100:
+                break
 
 import json
 
