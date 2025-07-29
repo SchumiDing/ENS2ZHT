@@ -52,11 +52,19 @@ class ChineseBertTokenizer:
         with torch.no_grad():
             outputs = self.model(**encoded)
             
+        # 计算到stop token的长度
+        input_ids = encoded['input_ids'].squeeze().tolist()
+        stop_token_id = self.tokenizer.sep_token_id
+        if stop_token_id in input_ids:
+            stop_index = input_ids.index(stop_token_id)
+        else:
+            stop_index = len(input_ids)
         return {
             'last_hidden_state': outputs.hidden_states[0],  # [1, seq_len, hidden_size]
             'pooler_output': outputs.pooler_output,          # [1, hidden_size]
             'hidden_size': outputs.hidden_states[0].shape[-1],
-            'sequence_length': outputs.hidden_states[0].shape[1]
+            'sequence_length': outputs.hidden_states[0].shape[1],
+            'stop_token_length': stop_index + 1
         }
     
     def batch_tokenize(self, texts, max_length=512):

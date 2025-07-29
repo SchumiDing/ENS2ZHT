@@ -34,7 +34,8 @@ class en2zh(torch.nn.Module):
                 num_decoder_layers=6,
                 dim_feedforward=2048,
                 dropout=0.1,
-                activation='relu'
+                activation='relu',
+                batch_first=True
             ),
             torch.nn.Transformer(
                 d_model=self.interval,
@@ -43,7 +44,8 @@ class en2zh(torch.nn.Module):
                 num_decoder_layers=6,
                 dim_feedforward=2048,
                 dropout=0.1,
-                activation='relu'
+                activation='relu',
+                batch_first=True
             ),
             torch.nn.Transformer(
                 d_model=self.interval,
@@ -52,7 +54,8 @@ class en2zh(torch.nn.Module):
                 num_decoder_layers=6,
                 dim_feedforward=2048,
                 dropout=0.1,
-                activation='relu'
+                activation='relu',
+                batch_first=True
             )
         )
         self.criterion = torch.nn.MSELoss()
@@ -74,6 +77,7 @@ class en2zh(torch.nn.Module):
             end = start + self.interval
             segment = audio[0][start:end]
             output[i] = segment
+        print(output.shape)
         return output
     
     def forward(self, audio: torch.Tensor, tgt=None):
@@ -130,23 +134,37 @@ class en2zh(torch.nn.Module):
     def createBatchTrainData(self, Audios: list[torch.Tensor], targetTexts: list[str], batch_size=32, device="mps"):
         batchAudio = []
         batchTarget = []
+        aims = []
         traindata = []
+        
         for audio, text in zip(Audios, targetTexts):
             audioTensor = self.audioTransform(audio)
-            targetTokens = self.tokenizemodel.to_vector(text)['last_hidden_state']
-            outAudio = None
+            d = self.tokenizemodel.to_vector(text)
+            targetTokens = d['last_hidden_state'].to(device)
+            stop_token_length = d['stop_token_length']
+            outAudio = torch.empty((len(targetTokens[0]), self.interval)).to(device)
+            
             for i in range(len(targetTokens[0])):
-                if i == 0:
-                    outAudio = targetTokens[0][0]
-                else:
-                    outAudio = torch.cat((outAudio, targetTokens[0][i].unsqueeze(0)), dim=0)
+                if stop_token_length <= 0:
+                    break
+                if i == 1:
+                    outAudio[0] = targetTokens[0][0]
+                elif i > 1:
+                    outAudio[i-1] = targetTokens[0][i]
+                
+                aims.append(targetTokens[0][i].unsqueeze(0).to(device))
                 batchAudio.append(audioTensor.to(device))
                 batchTarget.append(outAudio.to(device))
+                stop_token_length -= 1
             if len(batchAudio) >= batch_size:
-                traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0)))
+                traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
                 batchAudio = []
                 batchTarget = []
-
+                aims = []
+                print(f"Batch created with {len(traindata[-1][0])} audios and {len(traindata[-1][1])} targets.")
+        if len(batchAudio) > 0:
+            traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
+        print(traindata[-1][0].shape, traindata[-1][1].shape, traindata[-1][2].shape)
         return traindata
 
 if __name__ == "__main__":
