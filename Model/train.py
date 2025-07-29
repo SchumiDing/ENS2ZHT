@@ -37,7 +37,6 @@ else:
     device = "cpu"
 
 epoches = 10000
-batch_size = 32
 parser.add_argument('--epoches', type=int, default=10000, help='Number of training epochs (default: 10000)')
 args = parser.parse_args()
 if args.epoches > 10000:
@@ -46,6 +45,17 @@ elif args.epoches < 1:
     print("Warning: Epoches is set to a very low value, this may not train the model properly.")
 else:
     epoches = args.epoches
+    
+batch_size = 32
+parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training (default: 32)')
+args = parser.parse_args()
+if args.batch_size < 1:
+    raise ValueError("Batch size must be at least 1.")
+elif args.batch_size > 256:
+    batch_size = args.batch_size
+    print("Warning: Batch size is set to a very high value, this may cause memory issues.")
+else:
+    batch_size = args.batch_size
 
 import json, re
 import numpy as np
