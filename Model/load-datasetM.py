@@ -27,7 +27,7 @@ def translate_text(text, token, url):
         response = response.json()
         answer = response['choices'][0]['message']['content']
         answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
-        answer = re.sub(r'\(.*?\)', '', answer, flags=re.DOTALL)
+        answer = re.sub(r'（.*?）', '', answer, flags=re.DOTALL)
         return answer.replace("\n", "")
     else:
         print(f"Error: {response.status_code}, {response.text}")
@@ -60,6 +60,12 @@ def main():
 
     data = []
     tasks = []
+# global variable i shared across threads
+    global i
+    i = 0   
+    import threading
+    i_lock = threading.Lock()
+    # Use ThreadPoolExecutor to handle multithreading
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         for f in os.listdir(fildir):
             if f[0] == '.':
@@ -80,10 +86,12 @@ def main():
                     if not os.path.exists(audio_path):
                         continue
                     tasks.append(executor.submit(process_row, row, audio_path, token, ollamaurl))
+        cnt = 0
         for future in as_completed(tasks):
             result = future.result()
             data.append(result)
-            print(f"Processed {result['audio']['path']}, Chinese translation: {result['chinese']}")
+            cnt += 1
+            print(f"Processed {result['audio']['path']}, Chinese translation: {result['chinese']} ({cnt}/{len(tasks)})")
 
     out_path = f"Model/data/{fildir.split('/')[-1]}.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
