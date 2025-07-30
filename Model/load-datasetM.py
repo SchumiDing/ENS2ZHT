@@ -3,40 +3,58 @@ import re
 import torchaudio
 import requests
 import json
+import time
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def translate_text(text, token, url):
+def translate_text(text, token, url, retries: int = 5, backoff_factor: float = 1.5, timeout: int = 60):
+
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token
     }
-    prompt = "Please translate the following text into Chinese, do not output any other unrelated things, any other things that are not the translation text of the following input text should be ignored:\n\n"
-    response = requests.post(
-        url,
-        headers=headers,
-        json={
-            "model": "deepseek-reasoner",
-            "messages": [
-                {"role": "user", "content": prompt+text}
-            ],
-            "stream": False
-        }
+
+    prompt = (
+        "Please translate the following text into Chinese, do not output any other unrelated things, "
+        "any other things that are not the translation text of the following input text should be ignored:\n\n"
     )
-    if response.status_code == 200:
-        response = response.json()
-        answer = response['choices'][0]['message']['content']
-        answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
-        answer = re.sub(r'（.*?）', '', answer, flags=re.DOTALL)
-        return answer.replace("\n", "")
-    else:
-        print(f"Error: {response.status_code}, {response.text}")
-        return None
+
+    payload = {
+        "model": "deepseek-reasoner",
+        "messages": [{"role": "user", "content": prompt + text}],
+        "stream": False,
+    }
+
+    for attempt in range(retries):
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            response.raise_for_status()
+
+            data = response.json()
+            answer = data["choices"][0]["message"]["content"]
+
+            answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL)
+            answer = re.sub(r"（.*?）", "", answer, flags=re.DOTALL)
+            return answer.replace("\n", "")
+        except (requests.exceptions.RequestException, ValueError) as e:
+            if attempt < retries - 1:
+                wait_time = backoff_factor ** attempt
+                print(
+                    f"[translate_text] Request failed on attempt {attempt + 1}/{retries} (reason: {e}). "
+                    f"Retrying in {wait_time:.1f}s..."
+                )
+                time.sleep(wait_time)
+            else:
+                print(f"[translate_text] Failed after {retries} attempts – skipping this sample. ({e})")
+                return None
 
 def process_row(row, audio_path, token, url):
     audio_tensor, sample_rate = torchaudio.load(audio_path)
     text = " ".join(row.split(" ")[1:])
     chinese_translation = translate_text(text, token, url)
+    if chinese_translation is None:
+        chinese_translation = ""
     return {
         'audio': {
             'path': audio_path,
@@ -50,7 +68,7 @@ def process_row(row, audio_path, token, url):
 def main():
     parser = argparse.ArgumentParser(description="Load dataset and process audio/text with multithreaded translation.")
     parser.add_argument('--fildir', type=str, required=True, help='Directory containing the audio files and text files.')
-    parser.add_argument('--threads', type=int, default=48, help='Number of threads for translation API requests.')
+    parser.add_argument('--threads', type=int, default=24, help='Number of threads for translation API requests (default: 8, lower to reduce API errors).')
     args = parser.parse_args()
     fildir = args.fildir
     num_threads = args.threads
@@ -62,7 +80,7 @@ def main():
     tasks = []
 # global variable i shared across threads
     global i
-    i = 0   
+    i = 0
     import threading
     i_lock = threading.Lock()
     # Use ThreadPoolExecutor to handle multithreading
