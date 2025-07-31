@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description="Load dataset and train the model."
 parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training (default: 32)')
 parser.add_argument('--epoches', type=int, default=10000, help='Number of training epochs (default: 10000)')
 parser.add_argument('--dataset', type=str, required=True, help='Directory of a json file with audio and text info')
-parser.add_argument('--device', type=str, default='cpu', help='Device to use for training (default: mps)')
+parser.add_argument('--device', type=str, default='mps', help='Device to use for training (default: mps)')
 parser.add_argument('--traindevice', type=str, default='mps', help='Model to use for training (default: en2zh)')
 args = parser.parse_args()
 fil = args.dataset
@@ -39,7 +39,7 @@ elif args.device == "xpu":
 else:
     print(f"Unknown device {args.device}, falling back to CPU.")
     device = "cpu"
-
+print()
 epoches = 10000
 if args.epoches > 10000:
     print("Warning: Epoches is set to a very high value, this may take a long time to train.")

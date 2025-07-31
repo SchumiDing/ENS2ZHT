@@ -12,6 +12,8 @@ try:
 except ImportError:
     from tokenizer import ChineseBertTokenizer
 
+from Model.dataloader import audioTextDataset
+
 class en2zh(torch.nn.Module):
     def __init__(self):
         super(en2zh, self).__init__()
@@ -137,12 +139,16 @@ class en2zh(torch.nn.Module):
         aims = []
         traindata = []
         
+        cnt = 0
+        
         for audio, text in zip(Audios, targetTexts):
-            audioTensor = self.audioTransform(audio)
+            audioTensor = self.audioTransform(audio).to(device)
             d = self.tokenizemodel.to_vector(text)
             targetTokens = d['last_hidden_state'].to(device)
             stop_token_length = d['stop_token_length']
             outAudio = torch.empty((len(targetTokens[0]), self.interval)).to(device)
+            
+            torch.save(audioTensor, f"Model/data/audio_{cnt}.pt")
             
             for i in range(len(targetTokens[0])):
                 if stop_token_length <= 0:
@@ -152,20 +158,19 @@ class en2zh(torch.nn.Module):
                 elif i > 1:
                     outAudio[i-1] = targetTokens[0][i]
                 
-                aims.append(targetTokens[0][i].unsqueeze(0).to(device))
-                batchAudio.append(audioTensor.to(device))
-                batchTarget.append(outAudio.to(device))
+                print(targetTokens[0][i].shape, outAudio.shape, audioTensor.shape)
+                torch.save(targetTokens[0][i].unsqueeze(0), f"Model/data/target_{i}.pt")
+                torch.save(outAudio, f"Model/data/outAudio_{i}.pt")
+                
+                aims.append(f"Model/data/target_{i}.pt")
+                batchAudio.append(f"Model/data/audio_{cnt}.pt")
+                batchTarget.append(f"Model/data/outAudio_{i}.pt")
                 stop_token_length -= 1
-                if len(batchAudio) >= batch_size:
-                    traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
-                    batchAudio = []
-                    batchTarget = []
-                    aims = []
-                    print(f"Batch created with {len(traindata[-1][0])} audios and {len(traindata[-1][1])} targets.")
-        if len(batchAudio) > 0:
-            traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
-        print(traindata[-1][0].shape, traindata[-1][1].shape, traindata[-1][2].shape)
-        return traindata
+            cnt += 1
+        self.traindata = audioTextDataset(batchAudio, batchTarget, aims, device=device)
+        print(f"Created {len(self.traindata)} training samples.")
+        self.dataloader = torch.utils.data.DataLoader(self.traindata, batch_size=batch_size, shuffle=True, num_workers=0)
+        return self.dataloader
 
 if __name__ == "__main__":
     model = en2zh()
