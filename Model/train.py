@@ -90,7 +90,7 @@ if __name__ == "__main__":
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
-    print(f"Training data created with {len(train_data)} batches., each")
+    print(f"Training data created with {len(train_data)} batches.")
     if not os.path.exists('Model/pth'):
         os.makedirs('Model/pth')
     for epoch in range(epoches):

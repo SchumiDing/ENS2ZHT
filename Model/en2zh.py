@@ -159,7 +159,6 @@ class en2zh(torch.nn.Module):
                 elif i > 1:
                     outAudio[i-1] = targetTokens[0][i]
                 
-                print(targetTokens[0][i].shape, outAudio.shape, audioTensor.shape)
                 torch.save(targetTokens[0][i].unsqueeze(0), f"Model/data/audio_{cnt}/target_{i}.pt")
                 torch.save(outAudio, f"Model/data/audio_{cnt}/outAudio_{i}.pt")
                 
@@ -171,10 +170,11 @@ class en2zh(torch.nn.Module):
         self.traindata = audioTextDataset(batchAudio, batchTarget, aims, device=device)
         print(f"Created {len(self.traindata)} training samples.")
         self.dataloader = torch.utils.data.DataLoader(self.traindata, batch_size=batch_size, shuffle=True, num_workers=0)
+        print(f"Created DataLoader with batch size {batch_size}.")
+        
         return self.dataloader
 
 if __name__ == "__main__":
-    model = en2zh()
     
     # Example usage
     audio_input = torch.randn(1, 768*1000).to(device)  # Dummy audio input
