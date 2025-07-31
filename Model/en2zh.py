@@ -26,7 +26,7 @@ class en2zh(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Linear(self.interval, self.interval),
             torch.nn.ReLU(),
-            torch.nn.Linear(self.interval, self.output,)
+            torch.nn.Linear(self.interval, self.output)
         )
         self.transformers = torch.nn.Sequential(
             torch.nn.Transformer(
@@ -142,7 +142,8 @@ class en2zh(torch.nn.Module):
         cnt = 0
         
         for audio, text in zip(Audios, targetTexts):
-            audioTensor = self.audioTransform(audio).to(device)
+            audioTensor = torch.load(audio, map_location=device)
+            audioTensor = self.audioTransform(audioTensor)
             d = self.tokenizemodel.to_vector(text)
             targetTokens = d['last_hidden_state'].to(device)
             stop_token_length = d['stop_token_length']
