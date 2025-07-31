@@ -8,9 +8,12 @@ parser = argparse.ArgumentParser(description="Load dataset and train the model."
 parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training (default: 32)')
 parser.add_argument('--epoches', type=int, default=10000, help='Number of training epochs (default: 10000)')
 parser.add_argument('--dataset', type=str, required=True, help='Directory of a json file with audio and text info')
-parser.add_argument('--device', type=str, default='mps', help='Device to use for training (default: mps)')
+parser.add_argument('--device', type=str, default='cpu', help='Device to use for training (default: mps)')
+parser.add_argument('--traindevice', type=str, default='mps', help='Model to use for training (default: en2zh)')
 args = parser.parse_args()
 fil = args.dataset
+
+traindevice = args.traindevice
 
 device = "cpu"
 if args.device == "cpu":
@@ -62,7 +65,7 @@ if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
     
-    model = en2zh().to(device)
+    model = en2zh().to(traindevice)
     data = json.load(open(f"Model/data/{fil}.json", "r"))
     
     training = []
@@ -87,6 +90,9 @@ if __name__ == "__main__":
         for batch in train_data:
             model.optimizer.zero_grad()
             audio_batch, tpt,  text_batch = batch
+            audio_batch = audio_batch.to(traindevice)
+            tpt = tpt.to(traindevice)
+            text_batch = text_batch.to(traindevice)
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
             loss = model.criterion(ans, text_batch)
