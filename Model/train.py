@@ -60,43 +60,34 @@ else:
 
 import json, re
 import numpy as np
+import ijson
 
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
-
-    print("about to load tokenizer")
-    model = en2zh().to(traindevice)
-    print("loaded model, opening json")
-    data = json.load(open(f"Model/data/{fil}.json", "r"))
-    print("loaded json")
-
     training = []
     audio = []
     text = []
     skipped = 0
+    cnt = 0
     if not os.path.exists('Model/data/_temp'):
         os.makedirs('Model/data/_temp')
-    cnt = 0
-    for item in data:
-        chinese = item.get('chinese', '')
-        if chinese is None or chinese.strip() == "":
-            skipped += 1
-            continue
-
-        audio_tensor = torch.tensor(item['audio']['array'], dtype=torch.float32).to(device)
-        # training.append({
-        #     'audio': audio_tensor.to(device),
-        #     'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
-        # })
-        torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
-        audio.append(f"Model/data/_temp/audio_{cnt}.pt")
-        text.append(chinese)
-        cnt += 1
-    del data  # Free memory
+    print(f"Start to initiate the model")
+    model = en2zh().to(traindevice)
+    print("about to load tokenizer")
+    with open(f"Model/data/{fil}.json", "r") as f:
+        for item in ijson.items(f, 'item'):
+            audio_tensor = item.get('audio').get('array')
+            t = item.get('text')
+            audio_tensor = torch.tensor(audio_tensor, dtype=torch.float32)
+            torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
+            audio.append(f"Model/data/_temp/audio_{cnt}.pt")
+            text.append(t)
+            cnt += 1
+    print(f"Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
-
+    
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
     print(f"Training data created with {len(train_data)} batches.")
