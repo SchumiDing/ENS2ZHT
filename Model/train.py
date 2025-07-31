@@ -72,6 +72,9 @@ if __name__ == "__main__":
     audio = []
     text = []
     skipped = 0
+    if not os.path.exists('Model/data/_temp'):
+        os.makedirs('Model/data/_temp')
+    cnt = 0
     for item in data:
         chinese = item.get('chinese', '')
         if chinese is None or chinese.strip() == "":
@@ -83,11 +86,14 @@ if __name__ == "__main__":
         #     'audio': audio_tensor.to(device),
         #     'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
         # })
-        audio.append(audio_tensor)
+        torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
+        audio.append(f"Model/data/_temp/audio_{cnt}.pt")
         text.append(chinese)
-
+        cnt += 1
+    del data  # Free memory
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
+    
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
     print(f"Training data created with {len(train_data)} batches.")
