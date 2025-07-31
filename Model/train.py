@@ -60,37 +60,29 @@ else:
 
 import json, re
 import numpy as np
+import ijson
 
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
-    
-    model = en2zh().to(traindevice)
-    data = json.load(open(f"Model/data/{fil}.json", "r"))
-
     training = []
     audio = []
     text = []
     skipped = 0
+    cnt = 0
     if not os.path.exists('Model/data/_temp'):
         os.makedirs('Model/data/_temp')
-    cnt = 0
-    for item in data:
-        chinese = item.get('chinese', '')
-        if chinese is None or chinese.strip() == "":
-            skipped += 1
-            continue
-
-        audio_tensor = torch.tensor(item['audio']['array'], dtype=torch.float32).to(device)
-        # training.append({
-        #     'audio': audio_tensor.to(device),
-        #     'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
-        # })
-        torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
-        audio.append(f"Model/data/_temp/audio_{cnt}.pt")
-        text.append(chinese)
-        cnt += 1
-    del data  # Free memory
+    model = en2zh().to(traindevice)
+    with open(f"Model/data/{fil}.json", "r") as f:
+        for item in ijson.items(f, 'item'):
+            audio_tensor = item.get('audio').get('array')
+            t = item.get('text')
+            audio_tensor = torch.tensor(audio_tensor, dtype=torch.float32)
+            torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
+            audio.append(f"Model/data/_temp/audio_{cnt}.pt")
+            text.append(t)
+            cnt += 1
+   
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
     
