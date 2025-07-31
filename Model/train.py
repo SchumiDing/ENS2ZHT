@@ -64,9 +64,12 @@ import numpy as np
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
-    
+
+    print("about to load tokenizer")
     model = en2zh().to(traindevice)
+    print("loaded model, opening json")
     data = json.load(open(f"Model/data/{fil}.json", "r"))
+    print("loaded json")
 
     training = []
     audio = []
@@ -93,7 +96,7 @@ if __name__ == "__main__":
     del data  # Free memory
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
-    
+
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
     print(f"Training data created with {len(train_data)} batches.")
