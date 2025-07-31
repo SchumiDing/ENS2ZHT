@@ -79,7 +79,7 @@ class en2zh(torch.nn.Module):
             end = start + self.interval
             segment = audio[0][start:end]
             output[i] = segment
-        print(output.shape)
+        print('[en2zh.py] Transformed Audio Shape:', output.shape)
         return output
     
     def forward(self, audio: torch.Tensor, tgt=None):
@@ -169,10 +169,10 @@ class en2zh(torch.nn.Module):
                 stop_token_length -= 1
             cnt += 1
         self.traindata = audioTextDataset(batchAudio, batchTarget, aims, device=device)
-        print(f"Created {len(self.traindata)} training samples.")
+        print(f"[en2zh.py] Created {len(self.traindata)} training samples.")
         self.dataloader = torch.utils.data.DataLoader(self.traindata, batch_size=batch_size, shuffle=True, num_workers=0)
-        print(f"Created DataLoader with batch size {batch_size}.")
-        
+        print(f"[en2zh.py] Created DataLoader with batch size {batch_size}.")
+
         return self.dataloader
 
 if __name__ == "__main__":
@@ -181,8 +181,8 @@ if __name__ == "__main__":
     # Example usage
     audio_input = torch.randn(1, 768*1000).to(device)  # Dummy audio input
     audio_transformed = model.audioTransform(audio_input)
-    print("Transformed Audio Shape:", audio_transformed.shape)
-    
+    print("[en2zh.py] Transformed Audio Shape:", audio_transformed.shape)
+
     target_text = "我喜欢自然语言处理。"
     model.autoRegressorTraining(audio_transformed, target_text, epoches=5)
     

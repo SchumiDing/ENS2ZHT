@@ -109,7 +109,7 @@ def main():
             result = future.result()
             data.append(result)
             cnt += 1
-            print(f"Processed {result['audio']['path']}, Chinese translation: {result['chinese']} ({cnt}/{len(tasks)})")
+            print(f"[load-datasetM.py] Processed {result['audio']['path']}, Chinese translation: {result['chinese']} ({cnt}/{len(tasks)})")
 
     out_path = f"Model/data/{fildir.split('/')[-1]}.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

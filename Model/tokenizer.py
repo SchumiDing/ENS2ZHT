@@ -6,7 +6,7 @@ class ChineseBertTokenizer:
 
     def __init__(self, model_name="./local_chinese_bert"):
 
-        print(f"Loading tokenizer: {model_name}")
+        print(f"[tokenizer.py] Loading tokenizer: {model_name}")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model_name = model_name
         
@@ -111,7 +111,7 @@ class ChineseBertTokenizer:
     def vector_to_token_ids(self, hidden_states, top_k=1):
 
         if not hasattr(self, 'model'):
-            print(f"Loading model: {self.model_name}")
+            print(f"[tokenizer.py] Loading model: {self.model_name}")
             self.model = AutoModel.from_pretrained(self.model_name)
             self.model.eval()
         
@@ -144,24 +144,24 @@ def demo_chinese_bert_tokenizer():
 
     tokenized = tokenizer.tokenize_text(sample_texts)
     
-    print("Tokenization结果:")
-    print(f"文本: {tokenized['text']}")
-    print(f"Tokens: {tokenized['tokens']}, {len(tokenized['tokens'])}")
+    print("[tokenizer.py] Tokenization结果:")
+    print(f"[tokenizer.py] 文本: {tokenized['text']}")
+    print(f"[tokenizer.py] Tokens: {tokenized['tokens']}, {len(tokenized['tokens'])}")
     
     
     vectorized = tokenizer.to_vector(sample_texts)
-    print("\n向量化结果:")
-    print(f"Last Hidden State Shape: {vectorized['last_hidden_state'].shape}")
-    print(f"Pooler Output Shape: {vectorized['pooler_output'].shape}")
+    print("\n[tokenizer.py] 向量化结果:")
+    print(f"[tokenizer.py] Last Hidden State Shape: {vectorized['last_hidden_state'].shape}")
+    print(f"[tokenizer.py] Pooler Output Shape: {vectorized['pooler_output'].shape}")
     
     token_ids = tokenizer.vector_to_token_ids(vectorized['last_hidden_state'])
-    print("\n向量转换为Token IDs:")
-    print(f"Token IDs: {token_ids}")
-    
+    print("\n[tokenizer.py] 向量转换为Token IDs:")
+    print(f"[tokenizer.py] Token IDs: {token_ids}")
+
     text = tokenizer.decode_tokens(token_ids[0])
-    print("\n解码Token IDs:")
-    print(f"解码文本: {text}")
-    
+    print("\n[tokenizer.py] 解码Token IDs:")
+    print(f"[tokenizer.py] 解码文本: {text}")
+
 
 if __name__ == "__main__":
     demo_chinese_bert_tokenizer()
