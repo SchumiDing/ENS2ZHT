@@ -149,7 +149,8 @@ class en2zh(torch.nn.Module):
             outAudio = torch.empty((len(targetTokens[0]), self.interval)).to(device)
             
             torch.save(audioTensor, f"Model/data/audio_{cnt}.pt")
-            
+            if not os.path.exists(f"Model/data/audio_{cnt}"):
+                os.makedirs(f"Model/data/audio_{cnt}")
             for i in range(len(targetTokens[0])):
                 if stop_token_length <= 0:
                     break
