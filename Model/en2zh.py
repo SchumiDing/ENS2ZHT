@@ -159,12 +159,12 @@ class en2zh(torch.nn.Module):
                     outAudio[i-1] = targetTokens[0][i]
                 
                 print(targetTokens[0][i].shape, outAudio.shape, audioTensor.shape)
-                torch.save(targetTokens[0][i].unsqueeze(0), f"Model/data/target_{i}.pt")
-                torch.save(outAudio, f"Model/data/outAudio_{i}.pt")
+                torch.save(targetTokens[0][i].unsqueeze(0), f"Model/data/audio_{cnt}/target_{i}.pt")
+                torch.save(outAudio, f"Model/data/audio_{cnt}/outAudio_{i}.pt")
                 
-                aims.append(f"Model/data/target_{i}.pt")
+                aims.append(f"Model/data/audio_{cnt}/target_{i}.pt")
                 batchAudio.append(f"Model/data/audio_{cnt}.pt")
-                batchTarget.append(f"Model/data/outAudio_{i}.pt")
+                batchTarget.append(f"Model/data/audio_{cnt}/outAudio_{i}.pt")
                 stop_token_length -= 1
             cnt += 1
         self.traindata = audioTextDataset(batchAudio, batchTarget, aims, device=device)
