@@ -4,7 +4,7 @@ import torch
 
 class ChineseBertTokenizer:
 
-    def __init__(self, model_name="hfl/chinese-bert-wwm-ext"):
+    def __init__(self, model_name="./local_chinese_bert"):
 
         print(f"Loading tokenizer: {model_name}")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)

@@ -9,3 +9,4 @@ Model/data
 /Model/test-clean
 Model/ollama.token
 /Model/train-clean
+local_chinese_bert

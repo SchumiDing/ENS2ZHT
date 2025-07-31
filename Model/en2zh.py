@@ -20,7 +20,7 @@ class en2zh(torch.nn.Module):
         self.interval = 768
         self.step = 32
         self.output = 768
-        self.tokenizemodel = ChineseBertTokenizer("hfl/chinese-bert-wwm-ext")
+        self.tokenizemodel = ChineseBertTokenizer()
         self.final = torch.nn.Sequential(
             torch.nn.Linear(self.interval, self.interval),
             torch.nn.ReLU(),
