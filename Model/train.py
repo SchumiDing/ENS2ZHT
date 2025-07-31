@@ -72,9 +72,9 @@ if __name__ == "__main__":
     cnt = 0
     if not os.path.exists('Model/data/_temp'):
         os.makedirs('Model/data/_temp')
-    print(f"Start to initiate the model")
+    print(f"[train.py] Start to initiate the model")
     model = en2zh().to(traindevice)
-    print("about to load tokenizer")
+    print("[train.py] about to load tokenizer")
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
             audio_tensor = item.get('audio').get('array')
@@ -84,13 +84,13 @@ if __name__ == "__main__":
             audio.append(f"Model/data/_temp/audio_{cnt}.pt")
             text.append(t)
             cnt += 1
-    print(f"Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
+    print(f"[train.py] Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
     
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
-    print(f"Training data created with {len(train_data)} batches.")
+    print(f"[train.py] Training data created with {len(train_data)} batches.")
     if not os.path.exists('Model/pth'):
         os.makedirs('Model/pth')
     for epoch in range(epoches):
@@ -108,6 +108,6 @@ if __name__ == "__main__":
             loss.backward()
             model.optimizer.step()
             total_loss += loss.item()
-            print(f"Epoch {epoch+1}/{epoches}, Batch Loss: {loss.item()}")
-        print(f"Epoch {epoch+1}/{epoches}, Avg Total Loss: {total_loss/len(train_data)}")
+            print(f"[train.py] Epoch {epoch+1}/{epoches}, Batch Loss: {loss.item()}")
+        print(f"[train.py] Epoch {epoch+1}/{epoches}, Avg Total Loss: {total_loss/len(train_data)}")
         torch.save(model.state_dict(), 'Model/pth/en2zh_model.pth')
