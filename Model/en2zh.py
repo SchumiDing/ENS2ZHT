@@ -156,12 +156,12 @@ class en2zh(torch.nn.Module):
                 batchAudio.append(audioTensor.to(device))
                 batchTarget.append(outAudio.to(device))
                 stop_token_length -= 1
-            if len(batchAudio) >= batch_size:
-                traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
-                batchAudio = []
-                batchTarget = []
-                aims = []
-                print(f"Batch created with {len(traindata[-1][0])} audios and {len(traindata[-1][1])} targets.")
+                if len(batchAudio) >= batch_size:
+                    traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
+                    batchAudio = []
+                    batchTarget = []
+                    aims = []
+                    print(f"Batch created with {len(traindata[-1][0])} audios and {len(traindata[-1][1])} targets.")
         if len(batchAudio) > 0:
             traindata.append((torch.stack(batchAudio, dim=0), torch.stack(batchTarget, dim=0), torch.stack(aims, dim=0)))
         print(traindata[-1][0].shape, traindata[-1][1].shape, traindata[-1][2].shape)
