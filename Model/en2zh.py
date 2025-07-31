@@ -175,6 +175,7 @@ class en2zh(torch.nn.Module):
         return self.dataloader
 
 if __name__ == "__main__":
+    model = en2zh()
     
     # Example usage
     audio_input = torch.randn(1, 768*1000).to(device)  # Dummy audio input
