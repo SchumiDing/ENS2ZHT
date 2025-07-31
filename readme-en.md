@@ -9,17 +9,35 @@
   <a href="./readme.md" style="font-size:1.2em; font-weight:bold;">🌏 中文</a>
 </div>
 
+
 🌏 Enterprise-level English Speech to Chinese Text Model
 
-Welcome! This project delivers a highly efficient, low-cost, and easily deployable enterprise solution for translating English speech into Chinese text. Whether for call centers, meeting transcription, or multilingual content production, ENS2ZHT is ready for your business needs.
+Welcome to ENS2ZHT! This project is an end-to-end English speech to Chinese text system based on the PyTorch framework, designed for enterprise scenarios.
 
-🚀 **High Efficiency**: Built on advanced deep learning architectures and high-performance inference engines, the model processes large volumes of speech data rapidly, supporting both real-time and offline scenarios.
+🚀 **Technical Architecture**:
+* Audio feature extraction uses torchaudio, supporting multiple audio formats.
+* Text processing is based on HuggingFace Transformers, integrating Chinese-BERT-wwm-ext for tokenization and semantic encoding.
+* The main model structure is a multi-layer Transformer (6 encoder layers + 6 decoder layers, d_model=768, nhead=8, dim_feedforward=2048), with multiple Transformer blocks stacked to enhance modeling capability.
+* The output layer consists of multi-layer Linear+ReLU, mapping audio features to Chinese tokens.
+* Loss function: MSELoss; Optimizer: Adam.
 
-💾 **Low Training Cost**: By innovatively using hard disk caching for training data, memory consumption is greatly reduced, making large-scale training affordable and scalable even in resource-constrained environments.
+💾 **Data & Training**:
+* Supports LibriSpeech format data, automatically generates aligned English-Chinese training sets.
+* Training uses hard disk caching to greatly reduce memory usage, enabling large-scale datasets.
+* Supports CPU, MPS (Apple Silicon), CUDA devices.
 
-🔒 **Strong Deployability**: The project features a clear structure, supports mainstream cloud platforms and local servers, and is easy to integrate into existing workflows. Model files and data interfaces are standardized for fast enterprise deployment.
+🔒 **Features & Performance**:
+* Automatically transcribes English speech to Chinese text, supporting batch and real-time inference.
+* Initial tests show the model achieves end-to-end speech translation on standard datasets with strong generalization.
+* Extensible structure for custom pre/post-processing modules.
 
-🎯 **Rich Application Scenarios**: ENS2ZHT is ideal for customer service transcription, meeting archiving, smart subtitle generation, cross-border e-commerce translation, and more. With simple configuration, you can automate English speech to Chinese text conversion.
+🎯 **Application Scenarios**:
+* Customer service transcription
+* Meeting archiving
+* Smart subtitle generation
+* Cross-border e-commerce speech translation
+
+For detailed algorithm description, evaluation results, or custom features, please refer to the source code or open an issue.
 
 📦 **Quick Start**:
 1. Install dependencies:
