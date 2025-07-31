@@ -5,6 +5,10 @@
   <img src="https://img.shields.io/badge/Enterprise%20Speech%20Translation-blue.svg?style=for-the-badge" alt="badge" />
 </div>
 
+<div align="center">
+  <a href="./readme.md" style="font-size:1.2em; font-weight:bold;">🌏 中文</a>
+</div>
+
 🌏 Enterprise-level English Speech to Chinese Text Model
 
 Welcome! This project delivers a highly efficient, low-cost, and easily deployable enterprise solution for translating English speech into Chinese text. Whether for call centers, meeting transcription, or multilingual content production, ENS2ZHT is ready for your business needs.
@@ -18,9 +22,18 @@ Welcome! This project delivers a highly efficient, low-cost, and easily deployab
 🎯 **Rich Application Scenarios**: ENS2ZHT is ideal for customer service transcription, meeting archiving, smart subtitle generation, cross-border e-commerce translation, and more. With simple configuration, you can automate English speech to Chinese text conversion.
 
 📦 **Quick Start**:
-1. Install dependencies: `pip install -r requirements.txt`
-2. Prepare your data: Place English speech files in the specified directory
-3. Run the training script and experience the efficiency and low cost of hard disk caching
+1. Install dependencies:
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+2. Download tokenizer:
+```
+python Model/load_tokenizer.py
+```
+3. Prepare your data: Place English speech files in the specified directory
+4. Run the training script and experience the efficiency and low cost of hard disk caching
 
 ✨ **More Features**:
 * Supports multiple audio formats
@@ -84,3 +97,7 @@ The model will automatically convert English speech to Chinese text, suitable fo
 ---
 
 For further customization or integration, feel free to explore the source code or open an issue!
+
+---
+
+Feel free to star, fork, or open issues to help drive enterprise speech intelligence forward!

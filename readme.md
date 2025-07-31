@@ -24,9 +24,18 @@
 本项目适用于客服语音转写、会议内容归档、智能字幕生成、跨境电商语音翻译等多种场景。只需简单配置，即可实现英文语音到中文文字的自动转换。
 
 📦 **快速上手**：
-1. 安装依赖：`pip install -r requirements.txt`
-2. 准备数据：将英文语音文件放入指定目录
-3. 运行训练脚本，体验硬盘缓存带来的高效与低成本
+1. 安装依赖：
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+``` 
+2. 下载tokenizer：
+```
+python Model/load_tokenizer.py
+```
+3. 准备数据：将英文语音文件放入指定目录
+4. 运行训练脚本，体验硬盘缓存带来的高效与低成本
 
 ✨ **更多特性**：
 * 支持多种音频格式
