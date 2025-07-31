@@ -72,7 +72,9 @@ if __name__ == "__main__":
     cnt = 0
     if not os.path.exists('Model/data/_temp'):
         os.makedirs('Model/data/_temp')
+    print(f"Start to initiate the model")
     model = en2zh().to(traindevice)
+    print("about to load tokenizer")
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
             audio_tensor = item.get('audio').get('array')
@@ -82,7 +84,7 @@ if __name__ == "__main__":
             audio.append(f"Model/data/_temp/audio_{cnt}.pt")
             text.append(t)
             cnt += 1
-   
+    print(f"Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
     if skipped > 0:
         print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
     
