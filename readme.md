@@ -1,3 +1,10 @@
+<div align="center">
+  <h1 style="font-size:3em; font-weight:bold; letter-spacing:0.1em;">
+    ✨🌐 <span style="color:#0078D4; text-shadow: 2px 2px 8px #00bfff;">ENS2ZHT</span> 🌐✨
+  </h1>
+  <img src="https://img.shields.io/badge/Enterprise%20Speech%20Translation-blue.svg?style=for-the-badge" alt="badge" />
+</div>
+
 🌏 企业级英文语音转中文文字模型
 
 欢迎来到本项目！本项目致力于打造一个高效、低成本、可部署的企业级英文语音翻译为中文文字的解决方案。无论是呼叫中心、会议记录还是多语种内容生产，都能轻松应对。
