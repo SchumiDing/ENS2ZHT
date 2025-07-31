@@ -44,7 +44,7 @@ elif args.epoches < 1:
     print("Warning: Epoches is set to a very low value, this may not train the model properly.")
 else:
     epoches = args.epoches
-    
+
 batch_size = 32
 
 if args.batch_size < 1:
@@ -61,22 +61,30 @@ import numpy as np
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
-    
+
     model = en2zh().to(device)
     data = json.load(open(f"Model/data/{fil}.json", "r"))
-    
+
     training = []
     audio = []
     text = []
+    skipped = 0
     for item in data:
+        chinese = item.get('chinese', '')
+        if chinese is None or chinese.strip() == "":
+            skipped += 1
+            continue
+
         audio_tensor = torch.tensor(item['audio']['array'], dtype=torch.float32).to(device)
         # training.append({
         #     'audio': audio_tensor.to(device),
         #     'chinese': re.sub(r'\(.*?\)', '', item['chinese'], flags=re.DOTALL)
         # })
         audio.append(audio_tensor)
-        text.append(item['chinese'])
-    np.random.shuffle(training)
+        text.append(chinese)
+
+    if skipped > 0:
+        print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
     train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
     print(f"Training data created with {len(train_data)} batches., each")
@@ -90,7 +98,7 @@ if __name__ == "__main__":
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
             loss = model.criterion(ans, text_batch)
-            
+
             loss.backward()
             model.optimizer.step()
             total_loss += loss.item()
