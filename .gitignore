@@ -10,3 +10,4 @@ Model/data
 Model/ollama.token
 /Model/train-clean
 local_chinese_bert
+Model/__pycache__
