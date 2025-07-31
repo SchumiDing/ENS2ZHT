@@ -65,7 +65,7 @@ if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
     
-    model = en2zh().to(device)
+    model = en2zh().to(traindevice)
     data = json.load(open(f"Model/data/{fil}.json", "r"))
 
     training = []
