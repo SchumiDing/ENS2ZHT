@@ -75,6 +75,7 @@ class en2zh(torch.nn.Module):
         target_length = 10000
         current_length = audio.shape[1]
         output = torch.empty((target_length, self.interval), dtype=audio.dtype, device=audio.device)
+        i=0
         for i in range(output.shape[0]):
             start = i * self.step
             end = start + self.interval
@@ -84,7 +85,7 @@ class en2zh(torch.nn.Module):
             if (i + 1) * self.step + self.interval >= current_length:
                 break
 
-        print('[en2zh.py] Transformed Audio Shape:', output.shape, "target:", target_length, "current:", current_length)
+        print('[en2zh.py] Transformed Audio Shape:', output.shape, "target:", target_length, "current:", i)
 
         return output
     
