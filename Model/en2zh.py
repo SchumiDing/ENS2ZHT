@@ -73,7 +73,7 @@ class en2zh(torch.nn.Module):
 
     def audioTransform(self, audio: torch.Tensor):
         target_length = 10000
-        current_length = audio.shape[0]
+        current_length = audio.shape[1]
         output = torch.empty((target_length, self.interval), dtype=audio.dtype, device=audio.device)
         for i in range(output.shape[0]):
             start = i * self.step
