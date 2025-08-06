@@ -79,7 +79,7 @@ class en2zh(torch.nn.Module):
             end = start + self.interval
             segment = audio[0][start:end]
             output[i] = segment
-        print('[en2zh.py] Transformed Audio Shape:', output.shape)
+        
         target_length = 10000
         current_length = audio.shape[0]
         if current_length < target_length:
@@ -87,6 +87,7 @@ class en2zh(torch.nn.Module):
             audio = torch.nn.functional.pad(audio, (0, 0, 0, padding_needed), mode='constant', value=0)
         elif current_length > target_length:
             audio = audio[:target_length, :]
+        print('[en2zh.py] Transformed Audio Shape:', output.shape)
         return output
     
     def forward(self, audio: torch.Tensor, tgt=None):
