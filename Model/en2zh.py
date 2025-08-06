@@ -87,8 +87,8 @@ class en2zh(torch.nn.Module):
             audio = torch.cat((audio, torch.zeros((padding_needed, audio.shape[1]), dtype=audio.dtype, device=audio.device)), dim=0)
         elif current_length > target_length:
             audio = audio[:target_length, :]
-        print('[en2zh.py] Transformed Audio Shape:', output.shape)
-        
+        print('[en2zh.py] Transformed Audio Shape:', output.shape, "target:", target_length, "current:", current_length)
+
         return output
     
     def forward(self, audio: torch.Tensor, tgt=None):
