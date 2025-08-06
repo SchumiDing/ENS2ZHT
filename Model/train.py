@@ -76,6 +76,7 @@ if __name__ == "__main__":
     model = en2zh().to(traindevice)
     print(f"[train.py] Model initiated, loaded tokenizer")
     print("[train.py] Loading dataset from", fil)
+    datalength = 10000
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
             audio_tensor = item.get('audio').get('array')
@@ -86,6 +87,8 @@ if __name__ == "__main__":
             text.append(t)
             if cnt % 100 == 0:
                 print(f"[train.py] Processed {cnt} samples.")
+            if cnt >= datalength:
+                break
             cnt += 1
     print(f"[train.py] Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
     if skipped > 0:
