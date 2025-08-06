@@ -10,6 +10,8 @@ parser.add_argument('--epoches', type=int, default=10000, help='Number of traini
 parser.add_argument('--dataset', type=str, required=True, help='Directory of a json file with audio and text info')
 parser.add_argument('--device', type=str, default='mps', help='Device to use for training (default: mps)')
 parser.add_argument('--traindevice', type=str, default='mps', help='Model to use for training (default: en2zh)')
+parser.add_argument('--startLength', type=int, default=0, help='Start length of the dataset (default: 0)')
+parser.add_argument('--endLength', type=int, default=1000, help='End length of the dataset (default: 1000)')
 args = parser.parse_args()
 fil = args.dataset
 
@@ -57,7 +59,12 @@ elif args.batch_size > 256:
     print("Warning: Batch size is set to a very high value, this may cause memory issues.")
 else:
     batch_size = args.batch_size
-
+minlen = 0
+datalength = 1000
+if args.startLength > 0:
+    minlen = args.startLength
+if args.endLength > 0:
+    datalength = args.endLength
 import json, re
 import numpy as np
 import ijson
@@ -76,9 +83,12 @@ if __name__ == "__main__":
     model = en2zh().to(traindevice)
     print(f"[train.py] Model initiated, loaded tokenizer")
     print("[train.py] Loading dataset from", fil)
-    datalength = 10000
+
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
+            if cnt < minlen:
+                cnt += 1
+                continue
             audio_tensor = item.get('audio').get('array')
             t = item.get('text')
             audio_tensor = torch.tensor(audio_tensor, dtype=torch.float32)
