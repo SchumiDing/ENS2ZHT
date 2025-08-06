@@ -79,8 +79,9 @@ class en2zh(torch.nn.Module):
             start = i * self.step
             end = start + self.interval
             segment = audio[0][start:end]
+            
             output[i] = segment
-            if (i + 1) * self.step >= current_length:
+            if (i + 1) * self.step + self.interval >= current_length:
                 break
 
         print('[en2zh.py] Transformed Audio Shape:', output.shape, "target:", target_length, "current:", current_length)
