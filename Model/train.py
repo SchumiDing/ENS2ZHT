@@ -75,7 +75,7 @@ if __name__ == "__main__":
     print(f"[train.py] Start to initiate the model")
     model = en2zh().to(traindevice)
     print(f"[train.py] Model initiated, loaded tokenizer")
-    print("[train.py] about to load dataset from", fil)
+    print("[train.py] Loading dataset from", fil)
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
             audio_tensor = item.get('audio').get('array')
@@ -84,6 +84,8 @@ if __name__ == "__main__":
             torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
             audio.append(f"Model/data/_temp/audio_{cnt}.pt")
             text.append(t)
+            if cnt % 100 == 0:
+                print(f"[train.py] Processed {cnt} samples.")
             cnt += 1
     print(f"[train.py] Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
     if skipped > 0:
