@@ -74,7 +74,8 @@ if __name__ == "__main__":
         os.makedirs('Model/data/_temp')
     print(f"[train.py] Start to initiate the model")
     model = en2zh().to(traindevice)
-    print("[train.py] about to load tokenizer")
+    print(f"[train.py] Model initiated, loaded tokenizer")
+    print("[train.py] about to load dataset from", fil)
     with open(f"Model/data/{fil}.json", "r") as f:
         for item in ijson.items(f, 'item'):
             audio_tensor = item.get('audio').get('array')
