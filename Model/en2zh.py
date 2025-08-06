@@ -79,7 +79,14 @@ class en2zh(torch.nn.Module):
             end = start + self.interval
             segment = audio[0][start:end]
             output[i] = segment
-        print('[en2zh.py] Transformed Audio Shape:', output.shape)
+        # print('[en2zh.py] Transformed Audio Shape:', output.shape)
+        target_length = 10000
+        current_length = audio.shape[0]
+        if current_length < target_length:
+            padding_needed = target_length - current_length
+            audio = torch.nn.functional.pad(audio, (0, 0, 0, padding_needed), mode='constant', value=0)
+        elif current_length > target_length:
+            audio = audio[:target_length, :]
         return output
     
     def forward(self, audio: torch.Tensor, tgt=None):
@@ -103,7 +110,7 @@ class en2zh(torch.nn.Module):
                 break
             yield self.tokenizemodel.decode_tokens(newid[0][-1])
     
-    def autoRegressorTraining(self, inputAudio:torch.tensor, targetText:str, epoches=1, log=False):
+    def autoRegressorTraining(self, inputAudio:torch.tensor, targetText:str, epoches=1, log=True):
         inputAudio = inputAudio.to(device)
         targetTokens = self.tokenizemodel.to_vector(targetText)['last_hidden_state']
         targetTokens = targetTokens.to(device)
