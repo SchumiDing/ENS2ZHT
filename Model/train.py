@@ -117,7 +117,6 @@ if __name__ == "__main__":
     else:
         print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
         train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt', weights_only=False)
-        train_data.batch_size = batch_size
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:
