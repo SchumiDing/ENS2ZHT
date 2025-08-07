@@ -108,7 +108,7 @@ if __name__ == "__main__":
             print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
         
         train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
-
+        
         print(f"[train.py] Training data created with {len(train_data)} batches.")
         if not os.path.exists('Model/pth'):
             os.makedirs('Model/pth')
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     else:
         print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
         train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt', weights_only=False)
+        train_data.batch_size = batch_size
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:
