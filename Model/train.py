@@ -73,18 +73,19 @@ if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
     train_data = None
+    training = []
+    audio = []
+    text = []
+    skipped = 0
+    cnt = 0
+    if not os.path.exists('Model/data/_temp'):
+        os.makedirs('Model/data/_temp')
+    print(f"[train.py] Start to initiate the model")
+    model = en2zh().to(traindevice)
+    print(f"[train.py] Model initiated, loaded tokenizer")
+    print("[train.py] Loading dataset from", fil)
     if not os.path.exists(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt'):
-        training = []
-        audio = []
-        text = []
-        skipped = 0
-        cnt = 0
-        if not os.path.exists('Model/data/_temp'):
-            os.makedirs('Model/data/_temp')
-        print(f"[train.py] Start to initiate the model")
-        model = en2zh().to(traindevice)
-        print(f"[train.py] Model initiated, loaded tokenizer")
-        print("[train.py] Loading dataset from", fil)
+
 
         with open(f"Model/data/{fil}.json", "r") as f:
             for item in ijson.items(f, 'item'):
