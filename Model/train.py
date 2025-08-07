@@ -112,7 +112,7 @@ if __name__ == "__main__":
         if not os.path.exists('Model/pth'):
             os.makedirs('Model/pth')
         
-        # torch.save(train_data, f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
+        torch.save(train_data, f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
     else:
         print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
         train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
