@@ -72,43 +72,50 @@ import ijson
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
-    training = []
-    audio = []
-    text = []
-    skipped = 0
-    cnt = 0
-    if not os.path.exists('Model/data/_temp'):
-        os.makedirs('Model/data/_temp')
-    print(f"[train.py] Start to initiate the model")
-    model = en2zh().to(traindevice)
-    print(f"[train.py] Model initiated, loaded tokenizer")
-    print("[train.py] Loading dataset from", fil)
+    train_data = None
+    if not os.path.exists(f'Model/data/train_data_{fil}.pt'):
+        training = []
+        audio = []
+        text = []
+        skipped = 0
+        cnt = 0
+        if not os.path.exists('Model/data/_temp'):
+            os.makedirs('Model/data/_temp')
+        print(f"[train.py] Start to initiate the model")
+        model = en2zh().to(traindevice)
+        print(f"[train.py] Model initiated, loaded tokenizer")
+        print("[train.py] Loading dataset from", fil)
 
-    with open(f"Model/data/{fil}.json", "r") as f:
-        for item in ijson.items(f, 'item'):
-            if cnt < minlen:
+        with open(f"Model/data/{fil}.json", "r") as f:
+            for item in ijson.items(f, 'item'):
+                if cnt < minlen:
+                    cnt += 1
+                    continue
+                audio_tensor = item.get('audio').get('array')
+                t = item.get('text')
+                audio_tensor = torch.tensor(audio_tensor, dtype=torch.float32)
+                torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
+                audio.append(f"Model/data/_temp/audio_{cnt}.pt")
+                text.append(t)
+                if cnt % 100 == 0:
+                    print(f"[train.py] Processed {cnt} samples.")
+                if cnt >= datalength:
+                    break
                 cnt += 1
-                continue
-            audio_tensor = item.get('audio').get('array')
-            t = item.get('text')
-            audio_tensor = torch.tensor(audio_tensor, dtype=torch.float32)
-            torch.save(audio_tensor, f"Model/data/_temp/audio_{cnt}.pt")
-            audio.append(f"Model/data/_temp/audio_{cnt}.pt")
-            text.append(t)
-            if cnt % 100 == 0:
-                print(f"[train.py] Processed {cnt} samples.")
-            if cnt >= datalength:
-                break
-            cnt += 1
-    print(f"[train.py] Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
-    if skipped > 0:
-        print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
-    
-    train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
+        print(f"[train.py] Loaded {len(audio)} audio samples and {len(text)} text samples from {fil}.json.")
+        if skipped > 0:
+            print(f"[train.py] Skipped {skipped} samples that had empty Chinese translations; using {len(audio)} valid samples.")
+        
+        train_data = model.createBatchTrainData(audio, text, batch_size=batch_size, device=device)
 
-    print(f"[train.py] Training data created with {len(train_data)} batches.")
-    if not os.path.exists('Model/pth'):
-        os.makedirs('Model/pth')
+        print(f"[train.py] Training data created with {len(train_data)} batches.")
+        if not os.path.exists('Model/pth'):
+            os.makedirs('Model/pth')
+        
+        torch.save(train_data, f'Model/data/train_data_{fil}.pt')
+    else:
+        print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}.pt")
+        train_data = torch.load(f'Model/data/train_data_{fil}.pt')
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:

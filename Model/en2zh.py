@@ -18,7 +18,7 @@ class en2zh(torch.nn.Module):
     def __init__(self):
         super(en2zh, self).__init__()
         self.interval = 768
-        self.step = 32
+        self.step = 256
         self.output = 768
         self.tokenizemodel = ChineseBertTokenizer()
         self.final = torch.nn.Sequential(
@@ -72,7 +72,7 @@ class en2zh(torch.nn.Module):
         
 
     def audioTransform(self, audio: torch.Tensor):
-        target_length = 10000
+        target_length = 1250
         current_length = audio.shape[1]
         output = torch.empty((target_length, self.interval), dtype=audio.dtype, device=audio.device)
         i=0
