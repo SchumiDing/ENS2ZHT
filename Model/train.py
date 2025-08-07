@@ -73,7 +73,7 @@ if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
     train_data = None
-    if not os.path.exists(f'Model/data/train_data_{fil}.pt'):
+    if not os.path.exists(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt'):
         training = []
         audio = []
         text = []
@@ -112,10 +112,10 @@ if __name__ == "__main__":
         if not os.path.exists('Model/pth'):
             os.makedirs('Model/pth')
         
-        torch.save(train_data, f'Model/data/train_data_{fil}.pt')
+        torch.save(train_data, f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
     else:
-        print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}.pt")
-        train_data = torch.load(f'Model/data/train_data_{fil}.pt')
+        print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
+        train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:
