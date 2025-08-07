@@ -115,7 +115,7 @@ if __name__ == "__main__":
         torch.save(train_data, f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
     else:
         print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
-        train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt')
+        train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt', weights_only=False)
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:
