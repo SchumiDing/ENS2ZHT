@@ -74,7 +74,9 @@ def cosSimLoss(aM, bM):
     if len(aM) != len(bM):
         raise ValueError("Input tensors must have the same length.")
     com = 0
-    for a, b in zip(aM, bM):
+    for at, bt in zip(aM, bM):
+        a = at[0]
+        b = bt[0]
         a = a / torch.norm(a)
         b = b / torch.norm(b)
         com += (torch.dot(a, b)/ (torch.norm(a) * torch.norm(b)))/len(aM)
@@ -139,8 +141,7 @@ if __name__ == "__main__":
             text_batch = text_batch.to(traindevice)
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
-            print(ans.shape, text_batch.shape)
-            loss = cosSimLoss(ans, text_batch)
+            loss = cosSimLoss(ans[:, -1, :], text_batch)
             loss.backward()
             model.optimizer.step()
             total_loss += loss.item()
