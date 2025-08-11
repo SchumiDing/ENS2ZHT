@@ -139,6 +139,7 @@ if __name__ == "__main__":
             text_batch = text_batch.to(traindevice)
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
+            print(ans.shape, text_batch.shape)
             loss = cosSimLoss(ans, text_batch)
             loss.backward()
             model.optimizer.step()
