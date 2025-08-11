@@ -1,0 +1,56 @@
+# ENS2ZHT Project Feature Overview
+
+## 1. Introduction
+ENS2ZHT is an end-to-end English speech to Chinese text system based on PyTorch, designed for enterprise scenarios. It automates dataset generation, model training, and inference, making enterprise integration easy and efficient.
+
+## 2. Technical Architecture
+- Audio feature extraction using Wav2Vec2 (facebook/wav2vec2-base-960h) and Wav2Vec2Processor. Multiple audio formats are supported.
+- Text processing powered by ChineseBertTokenizer for tokenization and semantic encoding.
+- The main model is a large Transformer: 12 encoder layers + 12 decoder layers, d_model=768, nhead=8, dim_feedforward=2048.
+- Output layer: three Linear+ReLU layers, producing a 768-dimensional vector.
+- CosineEmbeddingLoss as loss function, Adam as optimizer.
+- Autoregressive inference, token decoding via ChineseBertTokenizer.
+- Supports batch training data generation and disk caching for large-scale training.
+
+## 3. Features & Performance
+- Automatic transcription of English speech to Chinese text, with batch and real-time inference support.
+- Strong generalization, tested on standard datasets.
+- Extensible structure allows integration of custom pre/post-processing modules.
+- Detailed logging and monitoring.
+
+## 4. Data & Training
+- Supports LibriSpeech format data, automatically generates aligned English-Chinese training sets.
+- Hard disk caching during training minimizes memory usage, enabling use of large datasets.
+- Compatible with CPU, MPS (Apple Silicon), and CUDA devices.
+
+## 5. Usage Workflow
+1. Dataset Generation
+   - Organize English speech/text data in LibriSpeech format.
+   - Use multithreaded script to generate bilingual training data.
+2. Model Training
+   - Train with configurable batch size, epochs, and device selection.
+   - Data is cached to disk for efficiency.
+3. Speech Translation
+   - Command-line tool for English audio to Chinese text translation.
+
+### Example Commands:
+- Generate dataset:
+  python Model/load-datasetM.py --fildir Model/test-clean --threads 24
+- Train model:
+  python Model/train.py --dataset test-clean --batch_size 32 --epoches 10000 --device mps
+- Translate audio:
+  python Model/translate.py --audio_file <path_to_audio_file> --model_path Model/pth/en2zh_model.pth --device mps
+
+## 6. Application Scenarios
+- Customer service voice transcription
+- Meeting content archiving
+- Smart subtitle generation
+- Cross-border e-commerce speech translation
+
+## 7. Additional Features
+- Batch and real-time inference
+- Fast installation and setup
+- JSON-based data packaging for easy downstream integration
+- Extensible architecture for custom module integration
+
+For further customization or integration, please consult the source code or open an issue in the repository.
