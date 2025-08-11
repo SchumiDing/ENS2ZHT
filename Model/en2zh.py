@@ -75,7 +75,9 @@ class en2zh(torch.nn.Module):
         input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(tdevice)
         outputs = self.wav2vec2(input_values)
         features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
-        F.pad(features, (0, 1250 - features.shape[1]), mode='constant', value=0.0, out=features)
+        out = torch.zeros((1250, 768), dtype=torch.float32, device=tdevice)
+        out[:features.shape[0], :] = features
+        features = out
         print(f"[en2zh.py] Extracted Wav2Vec2 features shape: {features.shape}")
         
         return features
