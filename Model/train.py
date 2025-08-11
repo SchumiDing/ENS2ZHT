@@ -74,6 +74,7 @@ def cosSimLoss(aM, bM):
     if len(aM) != len(bM):
         raise ValueError("Input tensors must have the same length.")
     com = 0
+    print(aM.shape, bM.shape)
     for at, bt in zip(aM, bM):
         a = at[0]
         b = bt[0]
