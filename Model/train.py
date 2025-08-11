@@ -74,7 +74,7 @@ def cosSimLoss(aM, bM):
     if len(aM) != len(bM):
         raise ValueError("Input tensors must have the same length.")
     com = 0
-    print(aM.shape, bM.shape)
+    # print(aM.shape, bM.shape)
     for a, bt in zip(aM, bM):
         b = bt[0]
         a = a / (torch.norm(a) + 1e-1)
