@@ -40,9 +40,10 @@ class en2zh(torch.nn.Module):
                 batch_first=True
             )
         )
-        self.criterion = torch.nn.MSELoss()
+        self.criterion = torch.nn.CosineEmbeddingLoss(margin=0.0, reduction='mean')
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         self.to(device)
+        self.project = torch.nn.Linear(768, 10000, bias=False)
         
         for param in self.parameters():
             if param.dim() > 1:
