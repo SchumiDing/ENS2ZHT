@@ -15,11 +15,13 @@
 Welcome to ENS2ZHT! This project is an end-to-end English speech to Chinese text system based on the PyTorch framework, designed for enterprise scenarios.
 
 🚀 **Technical Architecture**:
-* Audio feature extraction uses torchaudio, supporting multiple audio formats.
-* Text processing is based on HuggingFace Transformers, integrating Chinese-BERT-wwm-ext for tokenization and semantic encoding.
-* The main model structure is a multi-layer Transformer (6 encoder layers + 6 decoder layers, d_model=768, nhead=8, dim_feedforward=2048), with multiple Transformer blocks stacked to enhance modeling capability.
-* The output layer consists of multi-layer Linear+ReLU, mapping audio features to Chinese tokens.
-* Loss function: MSELoss; Optimizer: Adam.
+* Audio feature extraction uses Wav2Vec2 (facebook/wav2vec2-base-960h) and Wav2Vec2Processor, supporting multiple audio formats.
+* Text processing uses ChineseBertTokenizer for tokenization and semantic encoding.
+* The main model is a single large Transformer (12 encoder layers + 12 decoder layers, d_model=768, nhead=8, dim_feedforward=2048), enabling long-sequence modeling.
+* The output layer consists of three Linear+ReLU layers, final output is a 768-dimensional vector.
+* Loss function: CosineEmbeddingLoss; Optimizer: Adam.
+* Inference uses autoregressive generation, token decoding via ChineseBertTokenizer.
+* Supports batch training data generation and disk caching for large-scale training.
 
 💾 **Data & Training**:
 * Supports LibriSpeech format data, automatically generates aligned English-Chinese training sets.
@@ -93,24 +95,17 @@ python Model/train.py --dataset test-clean --batch_size 32 --epoches 10000 --dev
 
 During training, data is cached to disk, minimizing memory usage. Model parameters are saved to `Model/pth/en2zh_model.pth` after each epoch.
 
-### 3️⃣ English Speech to Chinese Text Inference
+#### 🏷️ Command-line One-click Translation
+You can directly use the `Model/translate.py` script to translate English audio files to Chinese text:
 
-For inference/translation, load the trained model and audio data, and call the model's `autoRegressor` or related interface:
-
-```python
-from Model.en2zh import en2zh
-import torch
-
-model = en2zh()
-model.load_state_dict(torch.load('Model/pth/en2zh_model.pth'))
-model.eval()
-
-audio = torch.load('Model/data/audio_0.pt')  # Load preprocessed audio
-for token in model.autoRegressor(audio):
-    print(token, end='')
+```bash
+python Model/translate.py --audio_file <path_to_audio_file> --model_path Model/pth/en2zh_model.pth --device mps
 ```
+- `--audio_file`: Path to the English audio file to be translated (supported formats readable by torchaudio)
+- `--model_path`: Path to the trained model parameter file
+- `--device`: Inference device (optional, supports cpu/mps/cuda, default mps)
 
-The model will automatically convert English speech to Chinese text, suitable for batch or real-time scenarios.
+The script will automatically load the model, process the audio, and output the translation result.
 
 ---
 

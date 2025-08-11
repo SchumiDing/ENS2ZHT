@@ -16,11 +16,13 @@
 欢迎来到本项目！ENS2ZHT 是一个基于 PyTorch 框架的端到端英文语音转中文文字系统，专为企业级场景设计。
 
 🚀 **技术架构**：
-* 语音特征提取采用 torchaudio，支持多种音频格式。
-* 文本处理基于 HuggingFace Transformers，集成 Chinese-BERT-wwm-ext 作为分词和语义编码器。
-* 主模型结构为多层 Transformer（6 层编码器 + 6 层解码器，d_model=768，nhead=8，dim_feedforward=2048），并串联多级 Transformer 以提升建模能力。
-* 输出层为多层线性+ReLU，实现语音到中文 token 的映射。
-* 损失函数采用 MSELoss，优化器为 Adam。
+* 语音特征提取采用 Wav2Vec2（facebook/wav2vec2-base-960h），通过 Wav2Vec2Processor 进行预处理，支持多种音频格式。
+* 文本处理基于 ChineseBertTokenizer，分词与语义编码。
+* 主模型结构为单个大规模 Transformer（12 层编码器 + 12 层解码器，d_model=768，nhead=8，dim_feedforward=2048），提升长序列建模能力。
+* 输出层为三层线性+ReLU，最终输出 768 维向量。
+* 损失函数采用 CosineEmbeddingLoss，优化器为 Adam。
+* 推理采用自回归生成，token 解码用 ChineseBertTokenizer。
+* 支持批量训练数据生成与硬盘缓存，便于大规模训练。
 
 💾 **数据与训练**：
 * 支持 LibriSpeech 格式数据，自动生成中英文对齐训练集。
@@ -95,24 +97,17 @@ python Model/train.py --dataset test-clean --batch_size 32 --epoches 10000 --dev
 
 训练过程中，模型会自动将数据缓存到硬盘，极大降低内存消耗。每轮训练后模型参数会保存到 `Model/pth/en2zh_model.pth`。
 
-### 3️⃣ 英文语音翻译为中文文字
+#### 🏷️ 命令行一键翻译
+你可以直接使用 `Model/translate.py` 脚本将英文音频文件翻译为中文文本：
 
-推理/翻译时，加载训练好的模型和音频数据，调用模型的 `autoRegressor` 或相关接口即可：
-
-```python
-from Model.en2zh import en2zh
-import torch
-
-model = en2zh()
-model.load_state_dict(torch.load('Model/pth/en2zh_model.pth'))
-model.eval()
-
-audio = torch.load('Model/data/audio_0.pt')  # 加载预处理音频
-for token in model.autoRegressor(audio):
-    print(token, end='')
+```bash
+python Model/translate.py --audio_file <音频文件路径> --model_path Model/pth/en2zh_model.pth --device mps
 ```
+- `--audio_file`：待翻译的英文音频文件路径（支持 torchaudio 可读格式）
+- `--model_path`：训练好的模型参数文件路径
+- `--device`：推理设备（可选，支持 cpu/mps/cuda，默认 mps）
 
-模型会自动将英文语音转为中文文本，适用于批量或实时场景。
+脚本会自动加载模型、处理音频并输出翻译结果。
 
 ---
 
