@@ -24,7 +24,7 @@ class en2zh(torch.nn.Module):
         self.tokenizemodel = ChineseBertTokenizer()
         # Initialize Wav2Vec2 for feature extraction
         self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
-        self.wav2vec2 = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h").cpu()
+        self.wav2vec2 = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
         self.final = torch.nn.Sequential(
             torch.nn.Linear(self.interval, self.interval),
             torch.nn.ReLU(),
@@ -70,7 +70,7 @@ class en2zh(torch.nn.Module):
     def audioTransform(self, audio: torch.Tensor):
         # Use Wav2Vec2 to extract deep features
         # audio shape: (1, seq_length)
-        tdevice = 'cpu'
+        tdevice = 'mps'
         input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(tdevice)
         outputs = self.wav2vec2(input_values)
         features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
