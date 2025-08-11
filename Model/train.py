@@ -69,6 +69,18 @@ import json, re
 import numpy as np
 import ijson
 
+def cosSimLoss(aM, bM):
+    
+    if len(aM) != len(bM):
+        raise ValueError("Input tensors must have the same length.")
+    com = 0
+    for a, b in zip(aM, bM):
+        a = a / torch.norm(a)
+        b = b / torch.norm(b)
+        com += (torch.dot(a, b)/ (torch.norm(a) * torch.norm(b)))/len(aM)
+    
+    return - com
+
 if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
@@ -127,8 +139,7 @@ if __name__ == "__main__":
             text_batch = text_batch.to(traindevice)
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
-            loss = model.criterion(ans, text_batch)
-
+            loss = cosSimLoss(ans, text_batch)
             loss.backward()
             model.optimizer.step()
             total_loss += loss.item()
