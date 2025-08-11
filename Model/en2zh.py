@@ -1,4 +1,5 @@
 import torch, torchaudio
+from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import sys
 import os
 
@@ -21,6 +22,9 @@ class en2zh(torch.nn.Module):
         self.step = 512
         self.output = 768
         self.tokenizemodel = ChineseBertTokenizer()
+        # Initialize Wav2Vec2 for feature extraction
+        self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+        self.wav2vec2 = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h").to(device)
         self.final = torch.nn.Sequential(
             torch.nn.Linear(self.interval, self.interval),
             torch.nn.ReLU(),
@@ -64,22 +68,13 @@ class en2zh(torch.nn.Module):
         
 
     def audioTransform(self, audio: torch.Tensor):
-        target_length = 1000
-        current_length = audio.shape[1]
-        output = torch.zeros((target_length, self.interval), dtype=audio.dtype, device=audio.device)
-        i=0
-        for i in range(output.shape[0]):
-            start = i * self.step
-            end = start + self.interval
-            segment = audio[0][start:end]
-            
-            output[i] = segment
-            if (i + 1) * self.step + self.interval >= current_length:
-                break
-
-        print('[en2zh.py] Transformed Audio Shape:', output.shape, "target:", target_length, "current:", i)
-
-        return output
+        # Use Wav2Vec2 to extract deep features
+        # audio shape: (1, seq_length)
+        input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(device)
+        outputs = self.wav2vec2(input_values)
+        features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
+        print(f"[en2zh.py] Extracted Wav2Vec2 features shape: {features.shape}")
+        return features
     
     def forward(self, audio: torch.Tensor, tgt=None):
         # 如果tgt为None，则用audio自身作为tgt（仅用于演示，实际可根据任务调整）
@@ -184,4 +179,3 @@ if __name__ == "__main__":
 
     target_text = "我喜欢自然语言处理。"
     model.autoRegressorTraining(audio_transformed, target_text, epoches=5)
-    
