@@ -74,7 +74,15 @@ class en2zh(torch.nn.Module):
         input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(tdevice)
         outputs = self.wav2vec2(input_values)
         features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
-        print(f"[en2zh.py] Extracted Wav2Vec2 features shape: {features.shape}")
+        # Pad or truncate to (1250, 768)
+        max_len = 1250
+        seq_len = features.size(0)
+        if seq_len < max_len:
+            pad = torch.zeros((max_len - seq_len, features.size(1)), device=features.device, dtype=features.dtype)
+            features = torch.cat((features, pad), dim=0)
+        else:
+            features = features[:max_len]
+        print(f"[en2zh.py] Padded Wav2Vec2 features shape: {features.shape}")
         return features
     
     def forward(self, audio: torch.Tensor, tgt=None):
