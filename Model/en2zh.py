@@ -24,7 +24,7 @@ class en2zh(torch.nn.Module):
         self.tokenizemodel = ChineseBertTokenizer()
         # Initialize Wav2Vec2 for feature extraction
         self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
-        self.wav2vec2 = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h").to('cpu')
+        self.wav2vec2 = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h").cpu()
         self.final = torch.nn.Sequential(
             torch.nn.Linear(self.interval, self.interval),
             torch.nn.ReLU(),
