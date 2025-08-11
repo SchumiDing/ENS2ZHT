@@ -77,10 +77,10 @@ def cosSimLoss(aM, bM):
     print(aM.shape, bM.shape)
     for a, bt in zip(aM, bM):
         b = bt[0]
-        a = a / torch.norm(a)
-        b = b / torch.norm(b)
-        com += (torch.dot(a, b)/ (torch.norm(a) * torch.norm(b)))/len(aM)
-    
+        a = a / (torch.norm(a) + 1e-8)
+        b = b / (torch.norm(b) + 1e-8)
+        com += (torch.dot(a, b)/ (torch.norm(a) * torch.norm(b)+1e-8))/len(aM)
+
     return - com
 
 if __name__ == "__main__":
