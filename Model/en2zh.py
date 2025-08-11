@@ -1,5 +1,6 @@
 import torch, torchaudio
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
+import torch.nn.functional as F
 import sys
 import os
 
@@ -68,21 +69,19 @@ class en2zh(torch.nn.Module):
         
 
     def audioTransform(self, audio: torch.Tensor):
-        # Use Wav2Vec2 to extract deep features
+        # Use Wav2Vec2 to extract deep features and pad to fixed size
         # audio shape: (1, seq_length)
-        tdevice = 'mps'
-        input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(tdevice)
+        input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(audio.device)
         outputs = self.wav2vec2(input_values)
         features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
         # Pad or truncate to (1250, 768)
         max_len = 1250
         seq_len = features.size(0)
         if seq_len < max_len:
-            pad = torch.zeros((max_len - seq_len, features.size(1)), device=features.device, dtype=features.dtype)
-            features = torch.cat((features, pad), dim=0)
+            features = F.pad(features, (0, 0, 0, max_len - seq_len))
         else:
             features = features[:max_len]
-        print(f"[en2zh.py] Padded Wav2Vec2 features shape: {features.shape}")
+        print(f"[en2zh.py] Padded features shape: {features.shape}")
         return features
     
     def forward(self, audio: torch.Tensor, tgt=None):
