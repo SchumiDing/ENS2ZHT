@@ -43,7 +43,18 @@ class en2zh(torch.nn.Module):
         self.criterion = torch.nn.CosineEmbeddingLoss(margin=0.0, reduction='mean')
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         self.to(device)
-        self.project = torch.nn.Linear(768, 10000, bias=False)
+        # self.project = torch.nn.Linear(768, 10000, bias=False)
+        
+        for param in self.transformers.parameters():
+            if param.dim() > 1:
+                torch.nn.init.xavier_uniform_(param)
+            else:
+                torch.nn.init.zeros_(param)
+        for param in self.final.parameters():
+            if param.dim() > 1:
+                torch.nn.init.xavier_uniform_(param)
+            else:
+                torch.nn.init.zeros_(param)
         
         for param in self.parameters():
             if param.dim() > 1:

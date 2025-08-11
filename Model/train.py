@@ -118,6 +118,11 @@ if __name__ == "__main__":
     else:
         print(f"[train.py] Training data already exists, loading from Model/data/train_data_{fil}_{minlen}_{datalength}.pt")
         train_data = torch.load(f'Model/data/train_data_{fil}_{minlen}_{datalength}.pt', weights_only=False)
+    try:
+        model.load_state_dict(torch.load('Model/pth/en2zh_model.pth', map_location=traindevice))
+        print("[train.py] Loaded existing model weights from Model/pth/en2zh_model.pth")
+    except Exception as e:
+        print("[train.py] No existing model weights found, starting training from scratch.")
     for epoch in range(epoches):
         total_loss = 0
         for batch in train_data:
