@@ -70,7 +70,12 @@ class en2zh(torch.nn.Module):
     def audioTransform(self, audio: torch.Tensor):
         # Use Wav2Vec2 to extract deep features
         # audio shape: (1, seq_length)
+        # Ensure model is on same device as audio to avoid CPU/MPS mismatch
+        model_device = audio.device
+        self.wav2vec2.to(model_device)
         input_values = self.processor(audio.squeeze(0), sampling_rate=16000, return_tensors="pt").input_values.to(device)
+        # Move inputs to model_device
+        input_values = input_values.to(model_device)
         outputs = self.wav2vec2(input_values)
         features = outputs.last_hidden_state.squeeze(0)  # (seq_len, hidden_size=768)
         print(f"[en2zh.py] Extracted Wav2Vec2 features shape: {features.shape}")

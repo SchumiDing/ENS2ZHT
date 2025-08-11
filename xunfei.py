@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import argparse
 
-
 def local_transcribe(audio_file_path: str, model_name: str = "base") -> str:
     """
     Transcribe audio locally using OpenAI Whisper model (default: base).
