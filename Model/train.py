@@ -129,7 +129,7 @@ if __name__ == "__main__":
             # print(audio_batch.shape, tpt.shape, text_batch.shape)
             ans = model.forward(audio_batch, tpt)
             tgs = torch.ones((ans.shape[0],), dtype=torch.float32, device=traindevice)
-            loss = -model.criterion(ans[:, -1, :], text_batch.squeeze(1), tgs)
+            loss = model.criterion(ans[:, -1, :], text_batch.squeeze(1), tgs)
             loss.backward()
             model.optimizer.step()
             total_loss += loss.item()
